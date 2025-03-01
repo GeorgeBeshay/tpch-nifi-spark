@@ -37,12 +37,14 @@ GROUP BY
 
 number_of_runs = 8
 query_execution_times = []
+export_path = "../../PySpark_Results.csv"
 
 for i in range(number_of_runs):
-    temp_execution_time = spark_client.execute_and_show_query_result(
+    _, temp_execution_time = spark_client.execute_and_show_query_result(
         query,
         num_rows=0,
-        show_all_rows= (i == number_of_runs-1)
+        show_all_rows= (i == number_of_runs-1),
+        export_path= export_path if (i == number_of_runs-1) else None,
     )
     query_execution_times.append(temp_execution_time)
 
