@@ -1,10 +1,12 @@
+from itertools import accumulate
+
 from OLAPQueryEngine import OLAPQueryEngine
 
 spark_client = OLAPQueryEngine(
     parquet_paths={
-        # "FCT_LINE_ITEM": "PATH.parquet",
-        # "DIM_DETAILED_ORDER": "PATH.parquet",
-        # "DIM_DETAILED_PART": "PATH.parquet",
+        "FCT_LINE_ITEM": "../parquet_files_output/line_item_fact.parquet",
+        "DIM_ORDER": "../parquet_files_output/order_dim.parquet",
+        "DIM_PART": "../parquet_files_output/part_dim.parquet",
     }
 )
 
@@ -33,5 +35,19 @@ GROUP BY
     S_NAME;
 """
 
-spark_client.execute_and_show_query_result(query)
+number_of_runs = 8
+query_execution_times = []
+
+for i in range(number_of_runs):
+    temp_execution_time = spark_client.execute_and_show_query_result(
+        query,
+        num_rows=0,
+        show_all_rows= (i == number_of_runs-1)
+    )
+    query_execution_times.append(temp_execution_time)
+
 spark_client.terminate_spark()
+
+for idx, query_execution_time in enumerate(query_execution_times):
+    print(f"Run #{idx} - Query took {query_execution_time:.4f} seconds.")
+print(f'Average query execution time = {sum(query_execution_times) / len(query_execution_times)}')

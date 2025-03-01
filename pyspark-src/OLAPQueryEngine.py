@@ -21,12 +21,14 @@ class OLAPQueryEngine:
         result = self._spark_engine.sql(query)
         return result
 
-    def execute_and_show_query_result(self, query: str, num_rows: int = 10):
+    def execute_and_show_query_result(self, query: str, num_rows: int = 10, show_all_rows: bool = False):
         start_time = time.time()
         result = self._execute_query(query)
         end_time = time.time()
-        result.show(num_rows)
-        print(f"Query took {(end_time - start_time):.4f} seconds.")
+        result.show(result.count() if show_all_rows else num_rows)
+        query_execution_time = end_time - start_time
+        print(f"Query took {query_execution_time:.4f} seconds.")
+        return query_execution_time
 
     def terminate_spark(self):
         self._spark_engine.stop()
