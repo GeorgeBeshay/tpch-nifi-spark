@@ -22,11 +22,14 @@ class OLAPQueryEngine:
         return result
 
     def execute_and_show_query_result(self, query: str, num_rows: int = 10, show_all_rows: bool = False, export_path: str = None):
+        self._spark_engine.catalog.clearCache()
         start_time = time.time()
         result = self._execute_query(query)
+        result_rows_count = result.count()      # action -> triggers actual execution of the transformation specified (query).
         end_time = time.time()
 
-        result.show(result.count() if show_all_rows else num_rows)
+        result.show(result_rows_count if show_all_rows else num_rows)
+
         query_execution_time = end_time - start_time
         print(f"Query took {query_execution_time:.4f} seconds.")
 
